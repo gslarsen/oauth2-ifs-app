@@ -1,0 +1,3 @@
+# always
+node_modules/
+.env
