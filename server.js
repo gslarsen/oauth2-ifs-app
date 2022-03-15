@@ -13,21 +13,29 @@ app.get ('/', function (req, res) {
 
 // IFS combined output
 app.get ('/ifs', async (req, res) => {
-    try{
+    let ifs_opp_users, ifs_opp_data, ifs_cust_data, ifs_oppline_data;
 
+    try{
         // IFS calls
-        const ifs_opp_users = await utils.fetch_ifs_users_for_eval(process.env.ACCESS_TOKEN);
-        const ifs_opp_data = await utils.fetch_ifs_opp_data_for_eval(process.env.ACCESS_TOKEN, ifs_opp_users);
-        const ifs_cust_data = await utils.fetch_ifs_cust_data_for_eval(process.env.ACCESS_TOKEN, ifs_opp_data);
-        const ifs_oppline_data = await utils.fetch_ifs_oppline_data_for_eval(process.env.ACCESS_TOKEN, ifs_cust_data);
-       
+        ifs_opp_users = await utils.fetch_ifs_users_for_eval(process.env.ACCESS_TOKEN);
+        ifs_opp_data = await utils.fetch_ifs_opp_data_for_eval(process.env.ACCESS_TOKEN, ifs_opp_users);
+        ifs_oppline_data = await utils.fetch_ifs_oppline_data_for_eval(process.env.ACCESS_TOKEN, ifs_opp_data);
+        ifs_cust_data = await utils.fetch_ifs_cust_data_for_eval(process.env.ACCESS_TOKEN, ifs_opp_data);
+        // console.log('\nifs_cust_data:\n', ifs_cust_data.data);
+        
         // combine calls into data structure -> ref. EVAL WEB APPLICATION SOLUTION DESIGN AND TECHNICAL DESIGN SPECIFICATION v2.5 December 16, 2021
         const output = utils.combineAll(ifs_opp_users.data, ifs_cust_data.data, ifs_opp_data.data, ifs_oppline_data.data );
         console.log('\nIFS combined output:\n', output);
         res.send(output);
         
     } catch(error) {
-        console.log('ERROR in /:\n', error);
+        console.log('ERROR in /:', error.response.status, error.response.config.url);
+        // handle case where cust city, state query (fetch_ifs_cust_data_for_eval) returned empty
+        if (error.response.status = 404) {
+            const output = utils.combineAll(ifs_opp_users.data, { Name: "", City: "", State: "" }, ifs_opp_data.data, ifs_oppline_data.data );
+            console.log('\nIFS combined output:\n', output);
+            res.send(output);
+        }
     }
      
 });
