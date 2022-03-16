@@ -20,7 +20,7 @@ const query_params = {
   };
 
 // passed scopes to access
-const scopes = ["731104b4-f6d2-4578-8143-16e39a9f022b/.default", 'profile', 'offline_access', 'openid'];
+const scopes = [`${process.env.CLIENT_ID}/.default`, 'profile', 'offline_access', 'openid'];
 
 // auth endpoint
 const get_auth_code_url = `${auth_token_endpoint}?${query_string.stringify (auth_token_params)}&scope=${scopes.join (' ')}`;
@@ -57,14 +57,13 @@ const fetch_ifs_users_for_eval = async access_token => {
 
     const instance = axios.create({
     method: "get",
-    baseURL:
-        "https://powersecure-dev.ifs.cloud:48080/main/ifsapplications/projection/v1/",
+    baseURL: process.env.BASE_URL,
     headers: {
             'Authorization': `Bearer ${access_token}`,
             'User-Agent': "axios/0.26.1",
             'Accept': "*/*",
             "Cache-Control": "no-cache",
-            "Host": "powersecure-dev.ifs.cloud:48080",
+            "Host": process.env.HOST,
             "Accept-Encoding": "gzip, deflate, br",
             "Connection": "keep-alive"
         }
