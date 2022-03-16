@@ -11,6 +11,45 @@ app.get ('/', function (req, res) {
   res.sendFile(path.join(__dirname + '/app/index.html'));
 });
 
+// authorization 
+app.get ('/auth', async (req, res) => {
+
+    if (!process.env.ACCESS_TOKEN) {
+        console.log('NO ACCESS_TOKEN FOUND - GET TOKEN')
+        try {
+            res.redirect (utils.get_auth_code_url);
+        } catch (error) {
+            // res.sendStatus (500);
+            console.log (error.message);
+        }
+    } else { // use the access_token
+        res.redirect('/ifs');
+    }
+    
+});
+
+// callback for tokens
+app.get ("/api/callback", async (req, res) => {
+    // get auth token from req param
+    const authorization_token = req.query.code;
+
+    try {
+        // get access token using authorization token
+        const response = await utils.get_access_token (authorization_token);
+        console.log ('\nAccess, Refresh, ID Tokens:\n', response.data);
+        
+        const {access_token} = response.data;
+        process.env['ACCESS_TOKEN'] = response.data.access_token;
+        process.env['REFRESH_TOKEN'] = response.data.refresh_token;
+        process.env['ID_TOKEN'] = response.data.id_token;
+        
+        res.redirect('/ifs');
+
+    } catch (error) {
+        console.log('ERROR in /api/callback:\n', error);
+    }
+});
+
 // IFS combined output
 app.get ('/ifs', async (req, res) => {
     let ifs_opp_users, ifs_opp_data, ifs_cust_data, ifs_oppline_data;
@@ -38,38 +77,6 @@ app.get ('/ifs', async (req, res) => {
         }
     }
      
-});
-
-// authorization 
-app.get ('/auth', async (req, res) => {
-    try {
-        res.redirect (utils.get_auth_code_url);
-    } catch (error) {
-        // res.sendStatus (500);
-        console.log (error.message);
-    }
-});
-
-// callback for tokens
-app.get ("/api/callback", async (req, res) => {
-    // get auth token from req param
-    const authorization_token = req.query.code;
-
-    try {
-        // get access token using authorization token
-        const response = await utils.get_access_token (authorization_token);
-        console.log ('\nAccess, Refresh, ID Tokens:\n', response.data);
-        
-        const {access_token} = response.data;
-        process.env['ACCESS_TOKEN'] = response.data.access_token;
-        process.env['REFRESH_TOKEN'] = response.data.refresh_token;
-        process.env['ID_TOKEN'] = response.data.id_token;
-        
-        res.redirect('/ifs');
-
-    } catch (error) {
-        console.log('ERROR in /api/callback:\n', error);
-    }
 });
 
 app.listen(port)
