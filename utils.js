@@ -3,9 +3,6 @@ const axios = require("axios");
 const https = require('https');
 require('dotenv').config();
 
-// Input opportunity #
-const opportunityNo = "2317"; 
-
 const auth_token_endpoint =process.env.AUTH_TOKEN_ENDPOINT;
 const access_token_endpoint = process.env.ACCESS_TOKEN_ENDPOINT;
 
@@ -97,7 +94,7 @@ const fetch_ifs_opp_data_for_eval = async (access_token, response) => {
 
     // opportunity & customer data
     const opportunityConfig = {
-    url: `BusinessOpportunityHandling.svc/BusinessOpportunities(OpportunityNo='${opportunityNo}')?$select=OpportunityNo,Description,CustomerId,MainRepresentativeId,Status,DateEntered,WantedDeliveryDate,MarketCode`,
+    url: `BusinessOpportunityHandling.svc/BusinessOpportunities(OpportunityNo='${process.env.OPPORTUNITY_NO}')?$select=OpportunityNo,Description,CustomerId,MainRepresentativeId,Status,DateEntered,WantedDeliveryDate,MarketCode`,
     };
 
     return await
@@ -155,7 +152,7 @@ const fetch_ifs_oppline_data_for_eval = async (access_token, response) => {
     return await
     instance({
         // opportunity line items
-        url: `BusinessOpportunityHandling.svc/BusinessOpportunityLines?$filter=OpportunityNo eq '${opportunityNo}'&$select=OpportunityNo,CustomerName,CustomerId,OpportunityDescription,DateEntered,Cf_Bol_Main_Rep,Status,WantedDeliveryDate,LineNo,Description,ConObjectType,ConObjectRef1`,
+        url: `BusinessOpportunityHandling.svc/BusinessOpportunityLines?$filter=OpportunityNo eq '${process.env.OPPORTUNITY_NO}'&$select=OpportunityNo,CustomerName,CustomerId,OpportunityDescription,DateEntered,Cf_Bol_Main_Rep,Status,WantedDeliveryDate,LineNo,Description,ConObjectType,ConObjectRef1`,
     })
 
 };

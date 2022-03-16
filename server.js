@@ -1,11 +1,13 @@
 const express = require ('express');
 const path = require('path');
 const utils = require ('./utils');
+const bodyParser = require("body-parser");
 require('dotenv').config();
 
 const port=3000;
 
 const app = express();
+app.use(bodyParser.urlencoded({extended: false}));
 
 app.get ('/', function (req, res) {
   res.sendFile(path.join(__dirname + '/app/index.html'));
@@ -13,6 +15,24 @@ app.get ('/', function (req, res) {
 
 // authorization 
 app.get ('/auth', async (req, res) => {
+    
+    if (!process.env.ACCESS_TOKEN) {
+        console.log('NO ACCESS_TOKEN FOUND - GET TOKEN')
+        try {
+            res.redirect (utils.get_auth_code_url);
+        } catch (error) {
+            // res.sendStatus (500);
+            console.log (error.message);
+        }
+    } else { // use the access_token
+        res.redirect('/ifs');
+    }
+    
+});
+
+app.post ('/auth', async (req, res) => {
+    
+    process.env['OPPORTUNITY_NO'] = req.body.oppCode;
 
     if (!process.env.ACCESS_TOKEN) {
         console.log('NO ACCESS_TOKEN FOUND - GET TOKEN')
@@ -52,6 +72,7 @@ app.get ("/api/callback", async (req, res) => {
 
 // IFS combined output
 app.get ('/ifs', async (req, res) => {
+   
     let ifs_opp_users, ifs_opp_data, ifs_cust_data, ifs_oppline_data;
 
     try{
@@ -68,7 +89,7 @@ app.get ('/ifs', async (req, res) => {
         res.send(output);
         
     } catch(error) {
-        console.log('ERROR in /:', error.response.status, error.response.config.url);
+        console.log('ERROR in /ifs:', error.response.status, error.response.config.url);
         // handle case where cust city, state query (fetch_ifs_cust_data_for_eval) returned empty
         if (error.response.status = 404) {
             const output = utils.combineAll(ifs_opp_users.data, { Name: "", City: "", State: "" }, ifs_opp_data.data, ifs_oppline_data.data );

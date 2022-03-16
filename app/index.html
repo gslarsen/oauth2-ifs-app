@@ -19,22 +19,25 @@
     <br>
     <h5 class="card-header text-center">IFS Requests</h5>
     <br>
-    <div class="row" style="margin:auto" >
-    <div id="card-div" class="col-md-12" >
-    <div class="card text-center">
-      <div class="card-body">
-        <h5 class="card-title text-center">Business Opportunity</h5>
-        <br>
-        <form action="http://localhost:3000/auth">
-            <input type="submit" class="btn btn-primary" value="Get Opportunity"/>
-        </form>
-        <br>
-        <br>
+    <div class="row mx-auto"  >
+      <div id="card-div" class="col-md-3 mx-auto" >
+      </div>     
+      <div id="card-div" class="col-md-3 mx-auto" >
+        <div class="card text-center">
+          <div class="card-body">
+            <h5 class="card-title text-center">Enter Business Opportunity</h5>
+            <div class="row mx-auto">
+                <form action="http://localhost:3000/auth" method="post" class="form-inline">
+                  <div class="form-group">
+                    <input name="oppCode" type="text" class="form-control mx-1" id="opportunityCode" placeholder="e.g. 2317">
+                    <input type="submit" class="btn btn-primary" value="Submit"/>
+                </div>
+                </form>           
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-    </div>
-    <br>
-    <br>
+    
       <div class="col-md-4">
         <div class="list-group" id="list-tab" role="tablist">
         </div>
